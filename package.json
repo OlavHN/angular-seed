@@ -1,0 +1,11 @@
+{
+  "name": "smsplus",
+  "main": "app/index.html",
+  "version": "1.0.0",
+  "dependencies": {
+    "bower": "0.7.1"
+  },
+  "scripts": {
+    "postinstall": "./node_modules/bower/bin/bower install"
+  }
+}

@@ -1,0 +1,61 @@
+<div ng-controller="LoginCtrl">
+  <div id="login" ng-show="showLogin">
+    <form name="loginForm" novalidate>
+      <label for="email">{{t('username')}}</label>
+      <div class="control">
+        <input type="email" id="email" ng-model="username" name="username" required />
+        <div class="input-help">
+          <h4>Invalid email</h4>
+        </div>
+      </div>
+      <span class="error" ng-show="loginForm.username.$error.email">Invalid emailicon</span><br />
+      <label for="password">Password</label>
+      <div class="control">
+        <input
+          type="password"
+          id="password"
+          ng-model="password"
+          class="immediate-help"
+          password-validate required />
+        <div class="input-help">
+          <h4>Password requirements</h4>
+          <ul>
+            <li ng-class="pwdValidLength">At least <strong>6 characters</strong></li> 
+            <li ng-class="pwdHasLowercase">At least <strong>1 captal letter</strong></li> 
+            <li ng-class="pwdHasUppercase">At least <strong>1 lower case letter</strong></li>
+          </ul>
+        </div>
+      </div>
+      <br />
+      <span ng-show="showReset">
+        Reset token: <input type="text" ng-model="token" />
+      </span><br />
+      <button
+        ng-disabled="loginForm.$invalid"
+        ng-click="login()">
+        Hello world
+      </button>
+    </form>
+    <button
+      ng-show="!showReset"
+      ng-click="resetPassword()">
+        Forgot password
+    </button>
+
+  </div>
+
+  <div id="register" ng-show="showRegister">
+    You do not have a phone attached to <em>{{username}}</em>.<br />
+    If you want to attach one, please enter the number below:<br />
+    <form name="registerForm" ng-submit="connect()">
+      <input type="text" ng-model="number" name="number" valid-phone-number required /><br />
+      <input type="text"
+        ng-model="pin"
+        name="pin"
+        ng-disabled="registerForm.number.$error.validPhoneNumber"
+        ng-pattern="/\w{6}/"
+        required /><br />
+      <button type="submit" ng-disabled="registerForm.$invalid">Connect phone</button>
+    </form>
+  </div>
+</div>

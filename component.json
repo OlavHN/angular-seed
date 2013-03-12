@@ -1,0 +1,9 @@
+{
+  "name": "sms plus",
+  "version": "1.0.0",
+  "dependencies": {
+    "q": "~0.9.2",
+    "requirejs": "~2.1.4",
+    "angular": "~1.0.4"
+  }
+}

@@ -1,0 +1,25 @@
+<div id="main">
+  <div id="nav" when-scrolled="expand()">
+    <input type="text" ng-model="query" />
+    <ul>
+      <li ng-repeat="conversation in getConversations() | filter:query | orderBy:'top.timestamp':'true' | limitTo:'30'">
+      
+      <a href="#"
+        ng-click="show($event, conversation, getNumber(conversation.top))">
+        {{conversation.top.body}}
+      </a>
+      </li>
+    </ul>
+  </div>
+
+  <div id="content">
+    <ul>
+      <li ng-repeat="message in getMessages() | orderBy:'timestamp':'true'" ng-class="message.delivery">
+        {{message.body}}
+      </li>
+    </ul>
+    <form ng-submit="send(content)">
+      <input type="text" ng-model="content" />
+    </form>
+  </div>
+</div>
