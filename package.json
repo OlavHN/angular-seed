@@ -2,8 +2,13 @@
   "name": "smsplus",
   "main": "app/index.html",
   "version": "1.0.0",
+  "engines": {
+    "node": "0.8.x",
+    "npm": "1.1.x"
+  },
   "dependencies": {
-    "bower": "0.7.1"
+    "bower": "0.7.x",
+    "connect": "2.7.x"
   },
   "scripts": {
     "postinstall": "./node_modules/bower/bin/bower install"
