@@ -24,6 +24,7 @@ require([
   'js/services/sms',
   'js/services/indexedDb',
   'js/services/translation',
+  'js/services/notification',
   'js/controllers/conversation',
   'js/controllers/login',
   'js/filters/filters',

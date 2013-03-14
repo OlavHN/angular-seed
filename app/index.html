@@ -1,9 +1,81 @@
 <!doctype html>
-<html lang="en" ng-app="websms">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <title>My AngularJS App</title>
   <link rel="stylesheet" href="css/app.css"/>
+
+  <script>
+    // Load library
+    var gui = require('nw.gui');
+    
+    // Reference to window and tray
+    var win = gui.Window.get();
+    var tray;
+
+    var fs = require('fs');
+
+    win.showDevTools()
+
+    var menu = new gui.Menu();
+    menu.append(new gui.MenuItem({label: 'Cookies for everyone!'}));
+
+    var drawTray = function(numMessages) {
+      var trayCanvas = document.createElement('canvas');
+      trayCanvas.height = '18';
+      trayCanvas.width = '30';
+      var trayCanvasCtx = trayCanvas.getContext('2d');
+
+      var canvasBg = new Image();
+      canvasBg.onload = function() {
+        trayCanvasCtx.drawImage(canvasBg, 0, 0);
+        trayCanvasCtx.fillText(numMessages, 5, 16);
+
+        var regex = /^data:.+\/(.+);base64,(.*)$/;
+
+        var matches = trayCanvas.toDataURL("image/png").match(regex);
+        var ext = matches[1];
+        var data = matches[2];
+        var buffer = new Buffer(data, 'base64');
+        fs.writeFileSync('app/img/tray_icon_tmp.' + ext, buffer);
+
+        tray.icon = 'app/img/tray_icon_tmp.png';
+      }
+      canvasBg.src = 'img/tray_icon.png';
+
+      trayCanvasCtx.fillStyle = "white";
+      trayCanvasCtx.font = "bold 18px Arial";
+    }
+
+    // Get the minimize event
+    win.on('minimize', function() {
+      // Hide window
+      this.hide();
+
+      // Show tray
+      tray = new gui.Tray({
+        icon: 'app/img/tray_icon_tmp.png',
+        menu: menu
+      });
+
+      // Show window and remove tray when clicked
+      tray.on('click', function() {
+        win.show();
+        this.remove();
+        tray = null;
+      });
+    });
+
+    win.on('restore', function() {
+      console.log('restoring');
+      drawTray(0);
+    });
+  </script>
+
+
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+  <script src="js/notifications.js"></script>
   <script>
     // The ONE naming conflict possible :(
     window.requireNode = window.require;
@@ -11,7 +83,7 @@
   </script>
   <script defer src="components/requirejs/require.js" data-main="js/configure.js"></script>
 </head>
-<body>
+<body id="body">
   <div ng-include="'partials/login.html'" ng-controller="LoginCtrl"></div>
   <div ng-include="'partials/conversation.html'" ng-controller="ConversationCtrl"></div>
 </body>

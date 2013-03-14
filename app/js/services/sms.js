@@ -24,8 +24,27 @@ define(['app', 'Q'], function(app, Q) {
     /* phone connection promises */
     var phoneDeferred, pinDeferred;
 
+    /* handle big integers as strings */
+    var addOne = function(num) {
+      num = num.split('').map(function(x) { return parseInt(x); });
+      var i = num.length;
+      var carry = true;
+      while (carry && i--) {
+        carry = false;
+        num[i]++;
+        if (num[i] > 9) {
+          num[i] = 0;
+          carry = true;
+        }
+      }
+      if (carry)
+        num.unshift(1);
+
+      return num.join('');
+    }
+
     /* Because of the async db we keep this one in memory */
-    var hgn;
+    var hgn = '000000000';
     db.get('meta', 'user').then(function(user) {
       if (user.hgn)
         hgn = user.hgn;
@@ -209,9 +228,7 @@ define(['app', 'Q'], function(app, Q) {
     }
 
     handle['ConversationHgn'] = function(data) {
-      var queryHgn = hgn ? hgn.substr(0, hgn.length - 9) + 
-        String(parseInt(hgn.substring(hgn.length - 9)) + 1) : 
-        '000000000';
+      var queryHgn = addOne(hgn);
 
       if (queryHgn < data.generation) {
         var msg = message('ConversationUpdateRequestCommand', {
@@ -226,9 +243,7 @@ define(['app', 'Q'], function(app, Q) {
     }
 
     handle['ConversationUpdateResponse'] = function(data) {
-      var queryHgn = hgn ? hgn.substr(0, hgn.length - 9) + 
-        String(parseInt(hgn.substring(hgn.length - 9)) + 1) :
-        '000000000';
+      var queryHgn = addOne(hgn);
 
       data.conversations.forEach(function(conversation) {
         var msg = message('MessageQueryCommand', {
@@ -244,7 +259,6 @@ define(['app', 'Q'], function(app, Q) {
     }
 
     handle['MessageQueryResponse'] = function(data) {
-      hgn = hgn || '0';
       if (hgn < data.messageHighestGeneration) {
         hgn = data.messageHighestGeneration;
         db.update('meta', 'user', {hgn: data.messageHighestGeneration});
@@ -262,6 +276,11 @@ define(['app', 'Q'], function(app, Q) {
           read: message.viewed,
           timestamp: message.createTime
         });
+
+        if (parseInt(message.createTime) + 1000*60 > parseInt(data.timestamp) &&
+            message.incoming && !message.viewed) {
+          sms.onMessage(messages[messages.length - 1]);
+        }
       });
 
       db.put('messages', messages, true);
@@ -284,17 +303,17 @@ define(['app', 'Q'], function(app, Q) {
     }
 
     var connect = function(endpoint) {
-      var socket = new WebSocket(endpoint);
+      var newSocket = new WebSocket(endpoint);
 
-      socket.onopen = function() {
-        (function keepAlive() {
-          console.log('keep alive');
-          socket.send('');
-          setTimeout(keepAlive, 30 * 1000);
-        })();
+      newSocket.onopen = function() {
+        keepAlive = setInterval(function() {
+          console.log('keep-alive');
+          newSocket.send('');
+        }, 30 * 1000);
+        
         init();
       }
-      socket.onmessage = function(message) {
+      newSocket.onmessage = function(message) {
         if (!message.data.length)
           return;
 
@@ -311,19 +330,20 @@ define(['app', 'Q'], function(app, Q) {
 
         handle[eventName] && handle[eventName](data);
       }
-      socket.onclose = function() {
+      newSocket.onclose = function() {
         console.log('reestablishing connection');
-
+        cleatInterval(keepAlive);
         // Reset promise
         loggedIn = Q.defer();
         // Reconnect
         socket = connect(endpoint);
       }
 
-      return socket;
+      return newSocket;
     }
+    var keepAlive;
     var socket = new connect(config.endpoint);
-
+    
     var init = function() {
       // Register site as a 'device' using sms+
       db.get('meta', 'user').then(function(user) {

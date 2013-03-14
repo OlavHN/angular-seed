@@ -1,25 +1,34 @@
 <div id="main">
   <div id="nav" when-scrolled="expand()">
-    <input type="text" ng-model="query" />
+    <input class="search" type="text" ng-model="query" ng-placeholder="t('search')" />
     <ul>
-      <li ng-repeat="conversation in getConversations() | filter:query | orderBy:'top.timestamp':'true' | limitTo:'30'">
-      
-      <a href="#"
-        ng-click="show($event, conversation, getNumber(conversation.top))">
-        {{conversation.top.body}}
-      </a>
+      <li class="conversation"
+          ng-repeat="conversation in getConversations() | filter:query | orderBy:'top.timestamp':'true'"
+          ng-click="show($event, conversation, getNumber(conversation.top))">
+        <span class="name">{{getNumber(conversation.top)}}</span>
+        <span class="time">{{conversation.top.timestamp | date}}</span>
+        <span class="title">{{conversation.top.body | truncate}}</span>
       </li>
     </ul>
   </div>
 
   <div id="content">
     <ul>
-      <li ng-repeat="message in getMessages() | orderBy:'timestamp':'true'" ng-class="message.delivery">
-        {{message.body}}
+      <li class="message"
+        ng-repeat="message in getMessages() | orderBy:'timestamp'"
+        ng-class="message.delivery"
+        scroll-to-last="'content'">
+        <div class="bubble">
+          <span class="date">{{message.timestamp | date}}</span>
+          <span class="text">{{message.body}}</span>
+        </div>
       </li>
     </ul>
     <form ng-submit="send(content)">
-      <input type="text" ng-model="content" />
+      <input class="send" 
+        type="text"
+        ng-model="content"
+        ng-placeholder="t('send', {receiver: receiver})" />
     </form>
   </div>
 </div>

@@ -1,8 +1,8 @@
 'use strict'
 
 define(['app'], function(app) {
-  app.controller('ConversationCtrl', function($scope, sms, translate) {
-    $scope.translate = translate;
+  app.controller('ConversationCtrl', function($scope, sms, translate, notification) {
+    $scope.t = translate;
 
     $scope.messages = {};
 
@@ -13,6 +13,7 @@ define(['app'], function(app) {
     $scope.show = function($event, conversation, number) {
       $scope.receiver = number;
       $scope.messages = conversation;
+      
       $event.preventDefault();
     }
 
@@ -70,11 +71,15 @@ define(['app'], function(app) {
       $scope.$apply();
     }
 
+    sms.onMessage = function(message) {
+      console.log(notification);
+      notification(null, message.sender, message.body, null);
+    }
+
     sms.onMessagesUpdated = addMessages;
 
     sms.getMessages().then(function(messages) {
       addMessages(messages);
     });
-   console.log(sms);
   });
 });

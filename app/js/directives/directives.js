@@ -3,16 +3,27 @@
 /* Directives */
 
 define(['app'], function(app) {
-  app.directive('whenScrolled', function() {
-    return function(scope, elm, attrs) {
-      var raw = elm[0];
 
-      elm.bind('scroll', function() {
-        if (raw.scrollStop + raw.offsetHeight >= raw.scrollHeight) {
-          scope.$apply(attr.whenScrolled);
-        }
-      });
-    };
+  app.directive('ngPlaceholder', function () {
+    return {
+      restrict: 'A',
+      link: function (scope, element, attrs) {
+        scope.$watch(attrs.ngPlaceholder, function(value) {
+          element[0].placeholder = value;
+        });
+      }
+    }
+  });
+
+  app.directive('scrollToLast', function () {
+    return function (scope, element, attributes) {
+      if (scope.$last) {
+        scope.$watch(attributes.scrollToLast, function(value) {
+          var div = document.getElementById(value);
+          div.scrollTop = div.scrollHeight;
+        });
+      }
+    }
   });
 
   app.directive('passwordValidate', function() {
