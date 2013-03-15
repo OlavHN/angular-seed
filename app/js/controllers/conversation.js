@@ -72,7 +72,6 @@ define(['app'], function(app) {
     }
 
     sms.onMessage = function(message) {
-      console.log(notification);
       notification(null, message.sender, message.body, null);
     }
 

@@ -6,19 +6,23 @@
   <link rel="stylesheet" href="css/app.css"/>
 
   <script>
-    // Load library
+/*    // Load library
     var gui = require('nw.gui');
     
     // Reference to window and tray
     var win = gui.Window.get();
-    var tray;
+
+    var menu = new gui.Menu();
+    menu.append(new gui.MenuItem({label: 'Cookies for everyone!'}));
+
+    var tray = new gui.Tray({
+      icon: 'app/img/tray_icon_tmp.png',
+      menu: menu
+    });
 
     var fs = require('fs');
 
     win.showDevTools()
-
-    var menu = new gui.Menu();
-    menu.append(new gui.MenuItem({label: 'Cookies for everyone!'}));
 
     var drawTray = function(numMessages) {
       var trayCanvas = document.createElement('canvas');
@@ -38,8 +42,10 @@
         var data = matches[2];
         var buffer = new Buffer(data, 'base64');
         fs.writeFileSync('app/img/tray_icon_tmp.' + ext, buffer);
-
-        tray.icon = 'app/img/tray_icon_tmp.png';
+        if (numMessages)
+          tray.icon = 'app/img/tray_icon_tmp.png';
+        else
+          tray.icon = 'app/img/tray_icon.png';
       }
       canvasBg.src = 'img/tray_icon.png';
 
@@ -52,24 +58,18 @@
       // Hide window
       this.hide();
 
-      // Show tray
-      tray = new gui.Tray({
-        icon: 'app/img/tray_icon_tmp.png',
-        menu: menu
-      });
-
       // Show window and remove tray when clicked
       tray.on('click', function() {
         win.show();
         this.remove();
-        tray = null;
+        // drawTray(0);
       });
     });
 
     win.on('restore', function() {
       console.log('restoring');
       drawTray(0);
-    });
+    });*/
   </script>
 
 

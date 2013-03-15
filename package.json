@@ -1,10 +1,10 @@
 {
   "name": "smsplus",
-  "main": "app/index.html",//"http://still-castle-3046.herokuapp.com/index.html",
+  "main": "app/index.html",
   "version": "1.0.0",
   "description": "SMS on the computer",
   "window": {
-    //"icon": "link.png",
+    "icon": "app/img/logo.png",
     "toolbar": false,
     "frame": true,
     "show": true,
